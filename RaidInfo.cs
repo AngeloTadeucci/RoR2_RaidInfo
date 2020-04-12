@@ -9,7 +9,7 @@ namespace RaidInfo {
     public class RaidInfo : BaseUnityPlugin {
         private float totalDamageDealt = 0;
         private Dictionary<string, float> map;
-
+        private string bossName;
         public void Awake() {
             BossGroup.onBossGroupStartServer += BossGroup_onBossGroupStartServer;
             BossGroup.onBossGroupDefeatedServer += BossGroup_onBossGroupDefeatedServer;
@@ -17,34 +17,37 @@ namespace RaidInfo {
         }
 
         private void GlobalEventManager_ServerDamageDealt(On.RoR2.GlobalEventManager.orig_ServerDamageDealt orig, DamageReport damageReport) {
-           if (damageReport.attacker != null) {
-                CharacterBody body = damageReport.attacker.GetComponent<CharacterBody>();
-                if (body != null) {
-                    var attackerIndex = body.GetUserName();
-                    if (damageReport.victimIsBoss) {
-                        if (map.ContainsKey(attackerIndex)) {
-                            map[attackerIndex] += damageReport.damageDealt;
-                        } else {
-                            map.Add(attackerIndex, damageReport.damageDealt);
-                        }
-                        totalDamageDealt += damageReport.damageDealt;
-                    }
-                }
-            }
             orig(damageReport);
+            if (damageReport.attacker != null || damageReport.victimBody != null) {
+                return;
+            }
+            CharacterBody attacker = damageReport.attackerBody;
+            CharacterBody victim = damageReport.victimBody;
+            if (damageReport.victimIsBoss) {
+                var attackerIndex = attacker.GetUserName();
+                if (map.ContainsKey(attackerIndex)) {
+                    map[attackerIndex] += damageReport.damageDealt;
+                } else {
+                    map.Add(attackerIndex, damageReport.damageDealt);
+                }
+                bossName = victim.GetUserName();
+                totalDamageDealt += damageReport.damageDealt;
+            }
         }
 
         private void BossGroup_onBossGroupDefeatedServer(BossGroup obj) {
             foreach (KeyValuePair<string, float> kvp in map) {
                 float temp = (kvp.Value / totalDamageDealt) * 100;
                 decimal dec = new decimal(temp);
-                Message.SendColoured("Player: " + kvp.Key + " dealt " + dec + " % of boss HP.", Colours.Red);
+                Message.SendColoured(kvp.Key + " dealt " + dec + " % of " + bossName + " HP.", Colours.Red);
             }
         }
 
         private void BossGroup_onBossGroupStartServer(BossGroup obj) {
             map = new Dictionary<string, float>();
             totalDamageDealt = 0;
+            bossName = null;
         }
+
     }
 }
