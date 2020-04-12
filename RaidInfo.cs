@@ -17,16 +17,18 @@ namespace RaidInfo {
         }
 
         private void GlobalEventManager_ServerDamageDealt(On.RoR2.GlobalEventManager.orig_ServerDamageDealt orig, DamageReport damageReport) {
-            CharacterBody body = damageReport.attacker.GetComponent<CharacterBody>();
-            if (body != null) {
-                var attackerIndex = body.GetUserName();
-                if (damageReport.victimIsBoss) {
-                    if (map.ContainsKey(attackerIndex)) {
-                        map[attackerIndex] += damageReport.damageDealt;
-                    } else {
-                        map.Add(attackerIndex, damageReport.damageDealt);
+           if (damageReport.attacker != null) {
+                CharacterBody body = damageReport.attacker.GetComponent<CharacterBody>();
+                if (body != null) {
+                    var attackerIndex = body.GetUserName();
+                    if (damageReport.victimIsBoss) {
+                        if (map.ContainsKey(attackerIndex)) {
+                            map[attackerIndex] += damageReport.damageDealt;
+                        } else {
+                            map.Add(attackerIndex, damageReport.damageDealt);
+                        }
+                        totalDamageDealt += damageReport.damageDealt;
                     }
-                    totalDamageDealt += damageReport.damageDealt;
                 }
             }
             orig(damageReport);
