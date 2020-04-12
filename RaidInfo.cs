@@ -10,6 +10,7 @@ namespace RaidInfo {
         private float totalDamageDealt = 0;
         private Dictionary<string, float> map;
         private string bossName;
+
         public void Awake() {
             BossGroup.onBossGroupStartServer += BossGroup_onBossGroupStartServer;
             BossGroup.onBossGroupDefeatedServer += BossGroup_onBossGroupDefeatedServer;
@@ -18,7 +19,7 @@ namespace RaidInfo {
 
         private void GlobalEventManager_ServerDamageDealt(On.RoR2.GlobalEventManager.orig_ServerDamageDealt orig, DamageReport damageReport) {
             orig(damageReport);
-            if (damageReport.attacker != null || damageReport.victimBody != null) {
+            if (damageReport.attacker == null || damageReport.victimBody == null) {
                 return;
             }
             CharacterBody attacker = damageReport.attackerBody;
