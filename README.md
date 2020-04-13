@@ -3,7 +3,7 @@ Time to blame your friends for dealing no damage! Discover who did more damage a
 
 Works in singleplayer, but it was made for multiplayer.
 
-# Feature
+# Features
 
 - Shows the amount in percentage of damage dealt to the boss HP.
 - Shows how much time your squad needed to kill the boss.
