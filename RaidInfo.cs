@@ -56,6 +56,7 @@ namespace RaidInfo {
             map = new Dictionary<string, float>();
             totalDamageDealt = 0;
             bossName = null;
+            ttk.Reset();
             ttk.Start();  
         }
     }
